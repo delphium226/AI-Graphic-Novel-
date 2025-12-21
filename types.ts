@@ -1,20 +1,14 @@
 
-export interface Message {
-  role: 'user' | 'model';
+export interface StoryPart {
   text: string;
-}
-
-export interface StoryState {
-  analysis: string;
-  story: string;
-  image: string | null;
-  loading: boolean;
-  error: string | null;
+  imageUrl: string | null;
 }
 
 export enum AppStatus {
   IDLE = 'IDLE',
-  ANALYZING = 'ANALYZING',
+  HINT_ENTRY = 'HINT_ENTRY',
+  ANALYSING = 'ANALYSING',
   READY = 'READY',
-  ERROR = 'ERROR'
+  ERROR = 'ERROR',
+  EXTENDING = 'EXTENDING'
 }

@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ink & Image</title>
+    <title>Ink & Image: Creative Story Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -28,6 +27,13 @@
       }
       ::-webkit-scrollbar-thumb:hover {
         background: #64748b;
+      }
+      @keyframes scan {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(300%); }
+      }
+      .animate-scan {
+        animation: scan 2s linear infinite;
       }
     </style>
   <script type="importmap">
