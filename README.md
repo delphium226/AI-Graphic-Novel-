@@ -1,20 +1,34 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Ink & Image: Creative Story Studio
 
-# Run and deploy your AI Studio app
+Ink & Image is a sophisticated creative writing interface that transforms initial visual seeds into immersive, multi-style narratives. By leveraging the power of the Gemini API, the application analyzes image moods and scenes to generate continuous story chapters accompanied by dynamic AI-generated visuals and cinematic narration.
 
-This contains everything you need to run your app locally.
+## ✨ Try It Yourself
 
-View your app in AI Studio: https://ai.studio/apps/drive/1idakzLZtF1CIBovZrHYUV04fk8tG9Xot
+Experience the creative journey live:
+**[Launch Creative Story Studio](https://ink-image-creative-story-studio-602284206810.us-west1.run.app/)**
 
-## Run Locally
+## 🚀 Key Features
 
-**Prerequisites:**  Node.js
+- **Initial Visual Analysis**: Upload an image to set the foundation for your story.
+- **Tone & Style Blending**: Select from multiple narrative tones (Mystery, Sci-Fi, Gothic, etc.) and visual aesthetics (Ghibli, Noir, Synthwave, and more).
+- **Dynamic Visual Continuity**: Advanced prompt engineering ensures characters maintain identity across chapters while changing poses and camera perspectives for a cinematic feel.
+- **Atmospheric Narration**: Listen to your story segments read by a cinematic AI voice.
+- **High-Quality PDF Export**: Compile your completed journey into a formatted graphic novel PDF, with each chapter on a new page.
+- **Responsive Workspace**: A dark-themed, premium UI designed for focused creative flow.
 
+## 🛠️ Built With
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- **React 19** & **Tailwind CSS**
+- **Google Gemini API** (@google/genai)
+  - `gemini-3-pro-preview` for sophisticated reasoning and prose.
+  - `gemini-3-pro-image-preview` for high-fidelity, identity-consistent visuals.
+  - `gemini-2.5-flash-preview-tts` for high-quality speech generation.
+- **jsPDF** for professional document generation.
+
+## 📖 How to Use
+
+1. **Select Tones**: Choose the emotional weight of your narrative.
+2. **Upload Seed**: Provide an initial image to inspire the AI.
+3. **Choose Aesthetic**: Pick the art styles for the generated story panels.
+4. **Direct the Story**: Provide a brief hint of where you want the plot to go.
+5. **Expand & Export**: Use "Continue Journey" to build chapters and "Export PDF" when your masterpiece is complete.
