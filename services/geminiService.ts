@@ -2,25 +2,26 @@ import { GoogleGenAI, Modality, Type } from "@google/genai";
 
 const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
-export const analyseImageAndWriteStory = async (base64Image: string, tone: string, hint?: string) => {
+export const analyseImageAndWriteStory = async (base64Image: string, tones: string[], hint?: string) => {
   const ai = getAI();
   const imageData = base64Image.split(',')[1];
   
-  const hintSection = hint ? `\nThe user has provided a narrative direction/hint: "${hint}". Incorporate this direction into the story naturally.` : "";
+  const toneString = tones.join(', ');
+  const hintSection = hint ? `\nUser narrative direction: "${hint}".` : "";
   
-  const prompt = `Analyse this image in detail. Then:
-  1. Generate a compelling, atmospheric title for the story (max 5 words).
-  2. Ghostwrite a compelling, evocative opening paragraph (approx 60-80 words) for a story set in this world.
-  3. Provide a "visualPrompt": This must be a detailed description for a graphic novel artist.
-     CRITICAL CHARACTER CONSISTENCY: You MUST define the physical appearance of the main protagonist(s) found in the image with extreme precision (e.g., "A tall woman with sharp cheekbones, wearing a midnight-blue velvet cloak with gold embroidery, her silver-streaked hair tied in a loose bun"). 
-     Describe the setting's mood, lighting, and key environmental features.
+  const prompt = `Analyse this image in detail and write a story opening.
+  1. Title: Compelling, atmospheric (max 5 words).
+  2. Story: Opening paragraph (60-80 words).
+  3. Visual Reference: A detailed DYNAMIC storyboard prompt for the next scene. 
+     Include: 
+     - A specific cinematic camera angle (e.g., Low Angle, Wide Shot, Dutch Angle).
+     - Character's new dynamic pose or action.
+     - Lighting and environmental shifts.
   
-  IMPORTANT: The story MUST be written in a ${tone.toUpperCase()} tone. ${hintSection}
+  MANDATORY TONE BLEND: Weave these atmospheric tones together seamlessly: ${toneString}.
+  ${hintSection}
   
-  All text MUST be written in British English (UK spelling).
-  
-  Return the response in a clear JSON format with keys: "story", "title", and "visualPrompt". 
-  The "visualPrompt" will serve as the master visual reference for all subsequent chapters.`;
+  Return JSON with "story", "title", and "visualPrompt". Use British English.`;
 
   const response = await ai.models.generateContent({
     model: 'gemini-3-pro-preview',
@@ -47,24 +48,20 @@ export const analyseImageAndWriteStory = async (base64Image: string, tone: strin
   return JSON.parse(response.text || '{}');
 };
 
-export const extendStory = async (base64Image: string, fullStory: string, tone: string) => {
+export const extendStory = async (base64Image: string, fullStory: string, tones: string[]) => {
   const ai = getAI();
   const imageData = base64Image.split(',')[1];
+  const toneString = tones.join(', ');
 
-  const prompt = `Continue the following story based on the attached reference image. Maintain the ${tone.toUpperCase()} tone. 
-  Write a single, evocative paragraph (approx 50-70 words) that significantly advances the plot and moves the characters to a NEW specific action or location.
+  const prompt = `Continue this story. BLENDED TONE: ${toneString}.
+  Write 60-80 words advancing the plot or introducing a new location.
+  Provide a NEW cinematic visualPrompt that describes a sequence different from the previous one.
   
-  All text MUST be written in British English (UK spelling).
+  REQUIREMENT: Specify a NEW camera angle and a NEW physical action for the characters to ensure the visual sequence is dynamic and progressive.
   
-  Provide a "visualPrompt": This is the artistic description for a COMPLETELY NEW frame in the graphic novel.
-  CRITICAL NARRATIVE CHANGE: This prompt MUST describe a new pose, a new specific action, and any changes in the background or environment as the story progresses.
-  STRICT CHARACTER CONSISTENCY: Carry over the exact visual traits (hair, face, clothing) of the protagonist from the reference image. 
-  The character should be the same, but doing something different in a new part of the scene or a new location entirely.
+  Current Context: "${fullStory}"
   
-  Current Story Context:
-  "${fullStory}"
-  
-  Return the response in JSON format with "nextPart" and "visualPrompt" keys.`;
+  Return JSON with "nextPart" and "visualPrompt".`;
 
   const response = await ai.models.generateContent({
     model: 'gemini-3-pro-preview',
@@ -90,33 +87,27 @@ export const extendStory = async (base64Image: string, fullStory: string, tone: 
   return JSON.parse(response.text || '{}');
 };
 
-export const generateStoryImage = async (referenceImageBase64: string, visualPrompt: string, styleInstruction: string) => {
+export const generateStoryImage = async (referenceImageBase64: string, visualPrompt: string, stylePrompts: string[]) => {
   const ai = getAI();
   const imageData = referenceImageBase64.split(',')[1];
+  const combinedStyle = stylePrompts.join(" Blend this aesthetic with: ");
 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-image-preview',
       contents: [{
         parts: [
-          {
-            inlineData: {
-              data: imageData,
-              mimeType: 'image/png',
-            },
-          },
-          {
-            text: `ARTISTIC STYLE: ${styleInstruction}
+          { inlineData: { data: imageData, mimeType: 'image/png' } },
+          { text: `ART STYLE MANDATE: ${combinedStyle}
+          
+DYNAMIC SCENE DESCRIPTION: ${visualPrompt}
 
-SUBJECT MATTER FOR NEW SCENE: ${visualPrompt}
-
-INSTRUCTIONS FOR NARRATIVE CONTINUITY:
-1. IDENTITY ANCHOR: The character from the attached REFERENCE IMAGE is your protagonist. You MUST reproduce their exact facial features, hair, and outfit in the NEW image.
-2. NEW ACTION/SCENE: You are NOT just editing the previous image. You are creating a NEW frame in a graphic novel. The character must be performing the NEW action described in the SUBJECT MATTER in the NEW environment.
-3. VISUAL STYLE ADHERENCE: Strictly maintain the "${styleInstruction}" aesthetic.
-4. CONSISTENCY: While the scene is new, the visual "DNA" (lighting quality, colour palette, and character design) must be identical to the reference image.`,
-          },
-        ],
+STRICT CONTINUITY & DYNAMIC SHIFT RULES:
+1. CHARACTER IDENTITY: Replicate character facial features, hair, and clothing EXACTLY from the REFERENCE IMAGE.
+2. POSE & PERSPECTIVE: DO NOT duplicate the pose or camera angle of the reference image. The character must be in a DIFFERENT pose and the camera must be at a DIFFERENT angle as specified in the DYNAMIC SCENE DESCRIPTION.
+3. COMPOSITION: Change the layout of the scene to create a sense of movement and progression.
+4. 16:9 aspect ratio.` }
+        ]
       }],
       config: {
         imageConfig: {
@@ -127,9 +118,7 @@ INSTRUCTIONS FOR NARRATIVE CONTINUITY:
     });
 
     for (const part of response.candidates?.[0]?.content?.parts || []) {
-      if (part.inlineData) {
-        return `data:image/png;base64,${part.inlineData.data}`;
-      }
+      if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
     }
   } catch (err) {
     console.error("Gemini Image Generation Error:", err);
@@ -141,7 +130,7 @@ export const generateNarration = async (text: string) => {
   const ai = getAI();
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash-preview-tts",
-    contents: [{ parts: [{ text: `Read this story as a soothing, elderly British English gentleman. Speak with a deep, resonant, and cinematic tone. Capture the profound emotion and atmospheric gravity of the prose: ${text}` }] }],
+    contents: [{ parts: [{ text: `Read with a cinematic, atmospheric deep tone: ${text}` }] }],
     config: {
       responseModalities: [Modality.AUDIO],
       speechConfig: {
@@ -151,6 +140,5 @@ export const generateNarration = async (text: string) => {
       },
     },
   });
-
   return response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
 };
