@@ -1,11 +1,11 @@
-# Ink & Image: Creative Story Studio
+# Graphic Novel Studio
 
-Ink & Image is a sophisticated creative writing interface that transforms initial visual seeds into immersive, multi-style narratives. By leveraging the power of the Gemini API, the application analyzes image moods and scenes to generate continuous story chapters accompanied by dynamic AI-generated visuals and cinematic narration.
+Graphic Novel Studio is a sophisticated creative writing interface that transforms initial visual seeds into immersive, multi-style narratives. By leveraging the power of the Gemini API, the application analyzes image moods and scenes to generate continuous story chapters accompanied by dynamic AI-generated visuals and cinematic narration.
 
 ## ✨ Try It Yourself
 
 Experience the creative journey live:
-**[Launch Creative Story Studio](https://ink-image-creative-story-studio-602284206810.us-west1.run.app/)**
+**[Launch Graphic Novel Studio](https://ink-image-creative-story-studio-602284206810.us-west1.run.app/)**
 
 ## 🚀 Key Features
 
